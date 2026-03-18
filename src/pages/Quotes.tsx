@@ -4,7 +4,7 @@ import { getQuotes } from '../lib/api';
 import { LoadingPage } from '../components/Spinner';
 import { Badge } from '../components/Badge';
 
-const PRESUPUESTOS_BASE_URL = 'http://92.113.38.153:8003';
+const PRESUPUESTOS_BASE_URL = 'https://presupuestos.mvdstudio.com.uy';
 
 interface Quote {
   id: number;

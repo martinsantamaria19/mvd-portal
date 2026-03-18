@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-const WHMCS_PROXY_URL = process.env.WHMCS_PROXY_URL || 'http://92.113.38.153:3099';
-const WHMCS_PROXY_SECRET = process.env.WHMCS_PROXY_SECRET || 'mvdstudio-proxy-2024-secret';
+const PRESUPUESTOS_URL = process.env.PRESUPUESTOS_URL || 'https://presupuestos.mvdstudio.com.uy';
+const PRESUPUESTOS_API_TOKEN = process.env.PRESUPUESTOS_API_TOKEN || '11f6f4d754fe8a3365130171649ca748eb2c6f063bfc7cfb9f4fe8d763371cd1';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS headers
@@ -25,10 +25,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const response = await fetch(
-      `${WHMCS_PROXY_URL}/api/presupuestos?whmcs_client_id=${encodeURIComponent(String(whmcs_client_id))}`,
+      `${PRESUPUESTOS_URL}/api/presupuestos?whmcs_client_id=${encodeURIComponent(String(whmcs_client_id))}`,
       {
         headers: {
-          'x-proxy-secret': WHMCS_PROXY_SECRET,
+          'X-API-Token': PRESUPUESTOS_API_TOKEN,
         },
       }
     );

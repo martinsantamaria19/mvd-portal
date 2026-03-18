@@ -31,6 +31,8 @@ interface Service {
   status: string;
   billingcycle: string;
   amount: string;
+  recurringamount: string;
+  firstpaymentamount: string;
 }
 
 function getStatusBadge(status: string) {
@@ -99,9 +101,12 @@ export function Services() {
                     <p className="text-text-secondary text-sm">
                       Próximo vencimiento: <span className="text-white font-medium">{formatDate(service.nextduedate)}</span>
                     </p>
-                    {service.amount && service.amount !== '0.00' && (
-                      <p className="text-accent font-semibold">USD {service.amount}</p>
-                    )}
+                    {(() => {
+                      const price = service.recurringamount || service.amount || service.firstpaymentamount;
+                      return price && parseFloat(price) > 0 ? (
+                        <p className="text-accent font-semibold">USD {parseFloat(price).toFixed(2)}</p>
+                      ) : null;
+                    })()}
                   </div>
                 </div>
               </div>

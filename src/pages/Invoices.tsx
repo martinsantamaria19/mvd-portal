@@ -4,6 +4,25 @@ import { getInvoices } from '../lib/api';
 import { LoadingPage } from '../components/Spinner';
 import { Badge } from '../components/Badge';
 
+function parseWhmcsDate(dateStr: string): Date {
+  if (!dateStr) return new Date(0);
+  // Handle DD/MM/YYYY format from WHMCS
+  const ddmmyyyy = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (ddmmyyyy) return new Date(`${ddmmyyyy[3]}-${ddmmyyyy[2]}-${ddmmyyyy[1]}`);
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? new Date(0) : d;
+}
+
+function formatDate(dateStr: string): string {
+  if (!dateStr) return '';
+  const d = parseWhmcsDate(dateStr);
+  if (d.getTime() === 0) return dateStr;
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const year = d.getUTCFullYear();
+  return `${day}/${month}/${year}`;
+}
+
 interface Invoice {
   id: string;
   invoicenum: string;
@@ -32,7 +51,12 @@ export function Invoices() {
   useEffect(() => {
     if (!user) return;
     getInvoices(user.id)
-      .then((data) => setInvoices(data.invoices?.invoice || []))
+      .then((data) => {
+        const list: Invoice[] = data.invoices?.invoice || [];
+        // Ordenar de más nueva a más vieja
+        list.sort((a, b) => parseWhmcsDate(b.date).getTime() - parseWhmcsDate(a.date).getTime());
+        setInvoices(list);
+      })
       .catch(() => setError('No se pudieron cargar las facturas.'))
       .finally(() => setLoading(false));
   }, [user]);
@@ -77,9 +101,9 @@ export function Invoices() {
                   return (
                     <tr key={invoice.id} className={i !== invoices.length - 1 ? 'border-b border-border' : ''}>
                       <td className="px-6 py-4 text-white font-medium">#{invoice.invoicenum || invoice.id}</td>
-                      <td className="px-6 py-4 text-text-secondary text-sm">{invoice.date}</td>
-                      <td className="px-6 py-4 text-text-secondary text-sm">{invoice.duedate}</td>
-                      <td className="px-6 py-4 text-white font-semibold">${invoice.total}</td>
+                      <td className="px-6 py-4 text-text-secondary text-sm">{formatDate(invoice.date)}</td>
+                      <td className="px-6 py-4 text-text-secondary text-sm">{formatDate(invoice.duedate)}</td>
+                      <td className="px-6 py-4 text-white font-semibold">USD {invoice.total}</td>
                       <td className="px-6 py-4">
                         <Badge variant={variant}>{label}</Badge>
                       </td>

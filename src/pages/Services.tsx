@@ -4,6 +4,24 @@ import { getClientProducts } from '../lib/api';
 import { LoadingPage } from '../components/Spinner';
 import { Badge } from '../components/Badge';
 
+function parseWhmcsDate(dateStr: string): Date {
+  if (!dateStr) return new Date(0);
+  const ddmmyyyy = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (ddmmyyyy) return new Date(`${ddmmyyyy[3]}-${ddmmyyyy[2]}-${ddmmyyyy[1]}`);
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? new Date(0) : d;
+}
+
+function formatDate(dateStr: string): string {
+  if (!dateStr) return '';
+  const d = parseWhmcsDate(dateStr);
+  if (d.getTime() === 0) return dateStr;
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const year = d.getUTCFullYear();
+  return `${day}/${month}/${year}`;
+}
+
 interface Service {
   id: string;
   name: string;
@@ -72,16 +90,18 @@ export function Services() {
                       <h3 className="text-white font-semibold">{service.name}</h3>
                       <p className="text-text-secondary text-sm">{service.groupname}</p>
                       <p className="text-text-secondary text-xs mt-1">
-                        Contratado el {service.regdate} · {service.billingcycle}
+                        Contratado el {formatDate(service.regdate)} · {service.billingcycle}
                       </p>
                     </div>
                   </div>
                   <div className="flex flex-col sm:items-end gap-2">
                     <Badge variant={variant}>{label}</Badge>
                     <p className="text-text-secondary text-sm">
-                      Próximo vencimiento: <span className="text-white font-medium">{service.nextduedate}</span>
+                      Próximo vencimiento: <span className="text-white font-medium">{formatDate(service.nextduedate)}</span>
                     </p>
-                    <p className="text-accent font-semibold">${service.amount}</p>
+                    {service.amount && service.amount !== '0.00' && (
+                      <p className="text-accent font-semibold">USD {service.amount}</p>
+                    )}
                   </div>
                 </div>
               </div>

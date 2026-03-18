@@ -4,6 +4,24 @@ import { getClientDomains } from '../lib/api';
 import { LoadingPage } from '../components/Spinner';
 import { Badge } from '../components/Badge';
 
+function parseWhmcsDate(dateStr: string): Date {
+  if (!dateStr) return new Date(0);
+  const ddmmyyyy = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (ddmmyyyy) return new Date(`${ddmmyyyy[3]}-${ddmmyyyy[2]}-${ddmmyyyy[1]}`);
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? new Date(0) : d;
+}
+
+function formatDate(dateStr: string): string {
+  if (!dateStr) return '';
+  const d = parseWhmcsDate(dateStr);
+  if (d.getTime() === 0) return dateStr;
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const year = d.getUTCFullYear();
+  return `${day}/${month}/${year}`;
+}
+
 interface Domain {
   id: string;
   domainname: string;
@@ -83,9 +101,9 @@ export function Domains() {
                           {domain.domainname}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-text-secondary text-sm">{domain.regdate}</td>
-                      <td className="px-6 py-4 text-text-secondary text-sm">{domain.expirydate || domain.nextduedate}</td>
-                      <td className="px-6 py-4 text-accent font-semibold">${domain.recurringamount}</td>
+                      <td className="px-6 py-4 text-text-secondary text-sm">{formatDate(domain.regdate)}</td>
+                      <td className="px-6 py-4 text-text-secondary text-sm">{formatDate(domain.expirydate || domain.nextduedate)}</td>
+                      <td className="px-6 py-4 text-accent font-semibold">USD {domain.recurringamount}</td>
                       <td className="px-6 py-4">
                         <Badge variant={variant}>{label}</Badge>
                       </td>

@@ -10,6 +10,7 @@ import { Domains } from './pages/Domains';
 import { Tickets } from './pages/Tickets';
 import { NewTicket } from './pages/NewTicket';
 import { Profile } from './pages/Profile';
+import { Quotes } from './pages/Quotes';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path="/tickets" element={<Tickets />} />
             <Route path="/tickets/new" element={<NewTicket />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/quotes" element={<Quotes />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -62,3 +62,11 @@ export async function openTicket(params: {
 export async function updateClientDetails(clientId: string, fields: Record<string, string>) {
   return whmcsRequest('UpdateClientDetails', { clientid: clientId, ...fields });
 }
+
+export async function getQuotes(whmcsClientId: string) {
+  const response = await fetch(`${API_BASE}/quotes?whmcs_client_id=${encodeURIComponent(whmcsClientId)}`);
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status}`);
+  }
+  return response.json();
+}

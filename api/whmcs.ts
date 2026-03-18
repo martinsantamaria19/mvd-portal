@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-const WHMCS_API_URL = process.env.WHMCS_API_URL!;
+const WHMCS_PROXY_URL = process.env.WHMCS_PROXY_URL || 'http://92.113.38.153:3099/api/whmcs';
+const WHMCS_PROXY_SECRET = process.env.WHMCS_PROXY_SECRET || 'mvdstudio-proxy-2024-secret';
 const WHMCS_IDENTIFIER = process.env.WHMCS_IDENTIFIER!;
 const WHMCS_SECRET = process.env.WHMCS_SECRET!;
 
@@ -35,14 +36,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ),
     });
 
-    const response = await fetch(WHMCS_API_URL, {
+    const response = await fetch(WHMCS_PROXY_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'x-proxy-secret': WHMCS_PROXY_SECRET,
+      },
       body: body.toString(),
     });
 
     if (!response.ok) {
-      return res.status(502).json({ error: 'WHMCS returned an error', status: response.status });
+      return res.status(502).json({ error: 'Proxy returned an error', status: response.status });
     }
 
     const data = await response.json();
